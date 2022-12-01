@@ -38,6 +38,7 @@ dependencies:
   flutter_svg: ^1.1.6
   form_validator: ^1.0.4
   google_sign_in: ^5.4.2
+  intl: ^0.17.0
   jitsi_meet: ^4.0.0
   material_color_generator: ^1.1.0
   nanoid: ^1.0.0

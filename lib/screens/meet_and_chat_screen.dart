@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_zoom_clone/services/auth_service.dart';
-import 'package:flutter_zoom_clone/widgets/meeting_id_and_name_input_bottomsheet.dart';
 import 'package:nanoid/async.dart';
 
+import '../services/auth_service.dart';
 import '../services/meeting_service.dart';
 import '../services/permission_service.dart';
 import '../utils/show_snackbar.dart';
 import '../widgets/custom_icon_button.dart';
+import '../widgets/join_meeting_bottomsheet.dart';
 
 class MeetAndChatScreen extends StatelessWidget {
   static const routeName = '/meet-and-chat';
@@ -17,9 +17,9 @@ class MeetAndChatScreen extends StatelessWidget {
     Future<void> handleCreateMeeting() async {
       AudioVideoPermissionStatus audioVideoPermissionStatus =
           await PermissionService().requestAudioVideo();
-      String roomName = await nanoid(12);
-      await MeetingService().createMeeting(
-        roomName: roomName,
+      String roomId = await nanoid(12);
+      await MeetingService().createOrJoinMeeting(
+        roomId: roomId,
         isAudioMuted: audioVideoPermissionStatus.isAudioGranted,
         isVideoMuted: audioVideoPermissionStatus.isVideoGranted,
         onError: (message) {
@@ -34,11 +34,8 @@ class MeetAndChatScreen extends StatelessWidget {
         context: context,
         isScrollControlled: true,
         builder: (context) {
-          return MeetingIdAndNameInputBottomSheet(
+          return JoinMeetingBottomsheet(
             username: username,
-            onMeetingIdAndNameInputComplete: (id, name) {
-              print('Meeting id is $id');
-            },
           );
         },
       );

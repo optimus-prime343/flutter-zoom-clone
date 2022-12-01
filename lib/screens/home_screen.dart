@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'contacts_screen.dart';
 import 'meet_and_chat_screen.dart';
-import 'meetings_screens.dart';
+import 'meetings_history_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     const MeetAndChatScreen(),
-    const MeetingsScreen(),
+    const MeetingsHistoryScreen(),
     const ContactsScreen(),
     const SettingsScreen(),
   ];

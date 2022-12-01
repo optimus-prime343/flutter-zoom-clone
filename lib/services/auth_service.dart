@@ -1,17 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'firestore_service.dart';
+
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   Stream<User?> authStateChanges() => _firebaseAuth.authStateChanges();
 
   User? get currentUser => _firebaseAuth.currentUser;
+  String? get userUid => _firebaseAuth.currentUser?.uid;
 
   String get currentUserUsername {
-    String? usernameFromEmail = currentUser?.email?.split('@')[0];
+    String? usernameFromEmail = currentUser?.email?.split('@')[0].toLowerCase();
     String? username = currentUser?.displayName;
 
     return username != null && username.isNotEmpty
@@ -19,22 +20,8 @@ class AuthService {
         : (usernameFromEmail ?? 'Anonymous');
   }
 
-  Future<void> saveUserInFirestore({
-    required UserCredential userCredential,
-  }) async {
-    User? user = userCredential.user;
-    if (user != null && userCredential.additionalUserInfo!.isNewUser) {
-      await _firebaseFirestore.collection('users').doc(user.uid).set({
-        'uid': user.uid,
-        'email': user.email,
-        'name': user.displayName,
-        'photoURL': user.photoURL,
-      });
-    }
-  }
-
   Future<void> signInWithGoogle({
-    required void Function(User user) onSuccess,
+    required void Function() onSuccess,
     required void Function(String error) onError,
   }) async {
     try {
@@ -51,11 +38,8 @@ class AuthService {
       );
       UserCredential userCredential =
           await _firebaseAuth.signInWithCredential(oAuthCredential);
-      User? user = userCredential.user;
-      if (user != null) {
-        await saveUserInFirestore(userCredential: userCredential);
-        onSuccess(user);
-      }
+      await FirestoreService().saveUserInfo(userCredential: userCredential);
+      onSuccess();
     } on FirebaseAuthException catch (e) {
       onError(e.message ?? "Login failed");
     }
@@ -88,7 +72,7 @@ class AuthService {
         email: email,
         password: password,
       );
-      await saveUserInFirestore(userCredential: userCredential);
+      await FirestoreService().saveUserInfo(userCredential: userCredential);
       onSuccess(userCredential);
     } on FirebaseAuthException catch (error) {
       onError(error.message ?? 'Signup failed');

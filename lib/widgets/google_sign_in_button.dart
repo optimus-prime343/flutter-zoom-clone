@@ -10,7 +10,7 @@ class GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     Future<void> handleGoogleLogin() async {
       await AuthService().signInWithGoogle(
-        onSuccess: (user) {
+        onSuccess: () {
           showSnackbar(context, 'Login successful');
         },
         onError: (message) {
